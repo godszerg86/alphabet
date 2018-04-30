@@ -25,21 +25,21 @@ document.addEventListener('DOMContentLoaded', function () {
     //function that start a new game and reset everything
     function startNewGame() {
         //hook up all event listeners on page
-        // document.querySelector('.restart').addEventListener('click', startNewGame);
+        document.querySelector('.reset').addEventListener('click', startNewGame);
         // document.querySelector('.newgame-style').addEventListener('click', startNewGame);
         deck.addEventListener('click', cardClick);
         //stars reset
-        // starPanel.innerHTML = '<li><i class="fa fa-star"></i></li><li><i class="fa fa-star"></i></li><li><i class="fa fa-star"></i></li>';
+        document.querySelector('.stars').innerHTML = '<i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>';
         // starWinPanel.innerHTML = '';
         // complete timer reset
-        // timerStop(true);
+        timerStop(true);
         //variables  and html page reset
         deckArray = [];
         movesCounter = 0;
         starIndex = 3;
         // document.querySelector('#win').textContent = '0';
         // document.querySelector('.win-popup').classList.remove('sh');
-        // document.querySelector('.moves').textContent = '0';
+        document.querySelector('.moves > span').textContent = movesCounter;
         //generate random card layout
        cardLayoutGenerator();
         // myNewShuffle();
@@ -108,21 +108,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //on cards mouse click function
     function cardClick(event) {
+        // console.log(event.target);
         //starting timer
         //checking if timer is running or not
-        // if (!timerOnOf) {
-        //     //if it wasn't lunched - setInterval and assign it to timerID (we can use clearInterval only on timerID)
-        //     timerID = setInterval(function () {
-        //         seconds++;
-        //         document.querySelector('#timer').textContent = seconds;
-        //     }, 1000);
-        //     //set timer switch to ON (it means that timer is runing now)
-        //     timerOnOf = true;
-        // }
+        if (!timerOnOf) {
+            //if it wasn't lunched - setInterval and assign it to timerID (we can use clearInterval only on timerID)
+            timerID = setInterval(function () {
+                seconds++;
+                document.querySelector('.timer > span').textContent = seconds;
+            }, 1000);
+            //set timer switch to ON (it means that timer is runing now)
+            timerOnOf = true;
+        }
         //checking if targeted (clicked) element is a card and it haven't been matched with another card before  and it haven't been opened and its only two cards opened at one time
-        if (!event.target.classList.contains('match') && event.target.classList.contains('card-container') && !event.target.classList.contains('open') && deckArray.length < 2) {
+        if (!event.target.classList.contains('match') && event.target.classList.contains('front') && !event.target.classList.contains('open') && deckArray.length < 2) {
             //add this element to array and use function 'cardOpener' to flip <li>
-
+            
             
             deckArray.push(cardOpener(event));
             // check how much elements in temporary array, if just one - do nothing and wating for another card to be clicked
@@ -137,8 +138,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     //if false, then call function 'shakerFunc' and 'hideCards' with delay 200ms and 900ms (to let them stay a little bit longer,
                     // so user can memorize position of cards in the game
                     //and pass in our current <li> elements
-                    setTimeout(shakerFunc, 200, deckArray[0], deckArray[1]);
-                    setTimeout(hideCards, 900, deckArray[0], deckArray[1]);
+                    setTimeout(shakerFunc, 400, deckArray[0], deckArray[1]);
+                    setTimeout(hideCards, 1050, deckArray[0], deckArray[1]);
                 }
                 //increasing our move counter;
                 movesCounter++
@@ -147,18 +148,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         //displaying current move counter
-        document.querySelector('.moves').textContent = movesCounter;
+        document.querySelector('.moves > span').textContent = movesCounter;
     }
 
     //function for flipping cards
     function cardOpener(event) {
         // adding class 'open' to clicked <li>
-        event.target.classList.add('open');
+        event.target.closest('.flipper').classList.add('open');
         // adding class 'show' to clicked <li> with small 150ms delay, so it will make smooth flipping effect,
         // and card will not be displayed immidiately
-        setTimeout(function () {
-            event.target.classList.add('show');
-        }, 150);
+        // setTimeout(function () {
+        //     event.target.classList.add('show');
+        // }, 150);
         //returning current <li> element that was clicked and flipped
         return event.target;
     }
@@ -166,7 +167,7 @@ document.addEventListener('DOMContentLoaded', function () {
     //function checks if the two passed in <li> elements are match or not
     function areTheyMatch(a, b) {
         // if class lists of inner <i> tags matches then return true, othewise return false
-        if (a.firstElementChild.classList.value === b.firstElementChild.classList.value) {
+        if (a.nextElementSibling.firstElementChild.getAttribute('src') === b.nextElementSibling.firstElementChild.getAttribute('src')) {
             return true;
         } else {
             return false;
@@ -176,10 +177,9 @@ document.addEventListener('DOMContentLoaded', function () {
     //function is making two clicked <li> cards matched by removing 'open' and 'show' classes and adding 'match' and 'tada' classes
     function makeMatch(a, b) {
         
-        a.classList.add('match', 'tada');
-        a.classList.remove('open', 'show');
-        b.classList.add('match', 'tada');
-        b.classList.remove('open', 'show');
+        a.nextElementSibling.firstElementChild.classList.add('tada');
+        b.nextElementSibling.firstElementChild.classList.add('tada');
+       
         //checking for win condition
         winCondition();
         //reseting temporary array that holds 2 cards (2 <li>)
@@ -189,16 +189,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function winCondition() {
         //live HTML collection of opend cards
-        const matchedCards = document.getElementsByClassName('match');
+        const matchedCards = document.getElementsByClassName('tada');
         //checking win condition:
         if (matchedCards.length === deck.children.length) {
-            document.querySelector('#win').textContent = movesCounter;
-            const tempStar = document.querySelector('.stars').cloneNode(true);
-            document.querySelector('#end-stars').appendChild(tempStar);
+            // document.querySelector('#win').textContent = movesCounter;
+            // const tempStar = document.querySelector('.stars').cloneNode(true);
+            // document.querySelector('#end-stars').appendChild(tempStar);
             //stop timer
             timerStop();
             // display pop up window with win message
-            document.querySelector('.win-popup').classList.add('sh');
+            // document.querySelector('.win-popup').classList.add('sh');
             //remove event listener from our deck, so user cannot manipulate on card elemenets anymore
             deck.removeEventListener('click', cardClick);
         }
@@ -207,35 +207,36 @@ document.addEventListener('DOMContentLoaded', function () {
     // function shake cards if they don't match, make them red
     function shakerFunc(a, b) {
         
-        a.classList.add('shaking');
-        a.style.background = '#c7484e';
-        b.classList.add('shaking');
-        b.style.background = '#c7484e';
+        a.nextElementSibling.firstElementChild.classList.add('shaking');
+        // a.nextElementSibling.firstElementChild.style.background = '#c7484e';
+        b.nextElementSibling.firstElementChild.classList.add('shaking');
+        // b.nextElementSibling.firstElementChild.style.background = '#c7484e';
     };
 
     // if cards are not match this function hide them back by removing 'open', 'show' and 'shaking' classes and red background
     function hideCards(a, b) {
-        a.classList.remove('open', 'show', 'shaking');
-        a.removeAttribute('style');
-        b.classList.remove('open', 'show', 'shaking');
-        b.removeAttribute('style');
+        a.nextElementSibling.firstElementChild.classList.remove('shaking');
+        a.closest('.flipper').classList.remove('open');
+        b.nextElementSibling.firstElementChild.classList.remove('shaking');
+        b.closest('.flipper').classList.remove('open');
+       
         //reseting temporary array that holds 2 cards (2 <li>)
         resetDeckArray();
     }
 
-    //timer stop function 
+    // //timer stop function 
     function timerStop(clear) {
         //clear setInterval for timer
         clearInterval(timerID);
         //reseting timerOnOf (timer isn't running)
         timerOnOf = false;
         //convert seconds to (h:m:s)
-        timeConverter(seconds);
+        // timeConverter(seconds);
         //reseting seconds
         seconds = 0;
         //if 'clear' is true - reset timer to 0 otherwise keep it
         if (clear) {
-            document.querySelector('#timer').textContent = seconds;
+            document.querySelector('.timer > span').textContent = seconds;
         }
     }
 
@@ -245,15 +246,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     //function converts seconds to H:M:S format.
-    function timeConverter(finalSeconds) {
-        const winHours = Math.floor(finalSeconds / 3600);
-        finalSeconds = finalSeconds - winHours * 3600;
-        const winMinutes = Math.floor(finalSeconds / 60);
-        finalSeconds = finalSeconds - winMinutes * 60;
-        document.querySelector('#time-hr').textContent = winHours;
-        document.querySelector('#time-min').textContent = winMinutes;
-        document.querySelector('#time-sec').textContent = finalSeconds;
-    }
+    // function timeConverter(finalSeconds) {
+    //     const winHours = Math.floor(finalSeconds / 3600);
+    //     finalSeconds = finalSeconds - winHours * 3600;
+    //     const winMinutes = Math.floor(finalSeconds / 60);
+    //     finalSeconds = finalSeconds - winMinutes * 60;
+    //     document.querySelector('#time-hr').textContent = winHours;
+    //     document.querySelector('#time-min').textContent = winMinutes;
+    //     document.querySelector('#time-sec').textContent = finalSeconds;
+    // }
 
     //function that remove stars base on movesCounter and starIndex
     function starRemover() {
