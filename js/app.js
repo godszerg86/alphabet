@@ -24,8 +24,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //function that start a new game and reset everything
     function startNewGame() {
+
         //hook up all event listeners on page
         document.querySelector('.reset').addEventListener('click', startNewGame);
+        document.querySelector('#modal-reset').addEventListener('click', startNewGame);
+        document.querySelector('.modal').classList.remove('modal-show');
+        
         // document.querySelector('.newgame-style').addEventListener('click', startNewGame);
         deck.addEventListener('click', cardClick);
         //stars reset
@@ -197,6 +201,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // document.querySelector('#end-stars').appendChild(tempStar);
             //stop timer
             timerStop();
+            document.querySelector('.modal').classList.add('modal-show');
             // display pop up window with win message
             // document.querySelector('.win-popup').classList.add('sh');
             //remove event listener from our deck, so user cannot manipulate on card elemenets anymore
